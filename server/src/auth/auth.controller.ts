@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
+import { ReferTokenDto } from './dtos/referesh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,5 +19,10 @@ export class AuthController {
   async loginUser(@Body() credentials: LoginDto) {
     return this.authService.loginUser(credentials)
   }
+
   //Post: Referesh Token
+  @Post('refresh')
+  async refereshToken(@Body() refereshTokenDto: ReferTokenDto) {
+    return this.authService.refereshToken(refereshTokenDto.refreshToken)
+  }
 }
