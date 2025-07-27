@@ -38,6 +38,7 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials')
     } 
-    return { message: 'Login successful', user }
+    const { password: hashedPassword, ...userDta } = user.toObject()
+    return { message: 'Login successful', userDta }
   }
 }
