@@ -9,9 +9,13 @@ import { User } from './schemas/user.schema'
 import { Model } from 'mongoose'
 import * as bcrypt from 'bcrypt'
 import { LoginDto } from './dtos/login.dto'
+import { JwtService } from '@nestjs/jwt'
 @Injectable()
 export class AuthService {
-  constructor (@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor (
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtSecret: JwtService,
+  ) {}
   async signup (signupData: SignupDto) {
     const { name, email, password } = signupData
     const existEmail = await this.userModel.findOne({ email })
@@ -37,8 +41,17 @@ export class AuthService {
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials')
-    } 
+    }
+    this
     const { password: hashedPassword, ...userDta } = user.toObject()
-    return { message: 'Login successful', userDta }
+    return this.generateJWT(userDta._id)
+  }
+  // generate JWT Token
+  async generateJWT (userId) {
+    const accessToken = await this.jwtSecret.sign(
+      { userId },
+      { expiresIn: '1h' },
+    )
+    return { accessToken }
   }
 }
