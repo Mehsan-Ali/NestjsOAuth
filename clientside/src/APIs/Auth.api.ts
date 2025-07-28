@@ -69,16 +69,27 @@ export const authAPI = {
     }
   },
 
-  getCurrentUser: async () => {
-    const token = localStorage.getItem('accessToken')
-    if (!token) throw new Error('Not authenticated')
-
-    const res = await axios.get('http://localhost:3000/auth/me', {
-      headers: {
-        Authorization: `Bearer ${token}`
+  getCurrentUser: async (setUser: any, setLoading: any, setError: any) => {
+    try {
+      const token = localStorage.getItem('accessToken')
+      setLoading(true)
+      if (!token) {
+        setLoading(false)
+        setError('Not authenticated')
+        throw new Error('Not authenticated')
       }
-    })
-
-    return res.data
+  
+      const res = await axios.get('http://localhost:3000/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setUser(res.data)
+      return res.data
+    } catch (error: any) {
+      setError(error.response?.data || 'Failed to fetch user')
+    } finally {
+      setLoading(false)
+    }
   }
 }
