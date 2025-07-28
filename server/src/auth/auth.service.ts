@@ -92,4 +92,13 @@ export class AuthService {
     )
     return token
   }
+  // find user by id
+  async findUserById (userId) {
+    const user = await this.userModel.findById(userId)
+    if (!user) {
+      return null // Or throw a NotFoundException if you prefer
+    }
+    const { password, ...userData } = user.toObject() // hide password
+    return userData
+  }
 }
